@@ -13,11 +13,30 @@ type CData struct {
 
 type CMemory struct {
 	m_sessions map[string]CData
-	m_mutex    sync.Mutex
+	m_mutex    sync.RWMutex
 }
 
 func (this *CMemory) init() {
 	this.m_sessions = make(map[string]CData)
+	this.check()
+}
+
+func (this *CMemory) check() {
+	go func() {
+		for {
+			this.m_mutex.RLock()
+			for id, data := range this.m_sessions {
+				if data.m_time.Add(time.Duration(data.m_timeoutS) * time.Second).Before(time.Now()) {
+					// timeout
+					this.m_mutex.Lock()
+					delete(this.m_sessions, id)
+					this.m_mutex.Unlock()
+				}
+			}
+			this.m_mutex.RUnlock()
+			time.Sleep(1 * time.Second)
+		}
+	}()
 }
 
 func (this *CMemory) Dial(rule string) error {
