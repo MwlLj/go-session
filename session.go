@@ -21,7 +21,7 @@ type ISession interface {
 		@name Reset
 		@params
 			id: Create return id
-			timeoutS: if this field is nil, kepp last timeoutS
+			timeoutS: if this field is nil, keep last timeoutS
 	*/
 	Reset(id *string, timeoutS *int64) error
 }
