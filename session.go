@@ -13,6 +13,12 @@ var Memory_type_memory string = "memory"
 var Memory_type_redis string = "redis"
 
 type ISession interface {
+	/*
+		@name Dial
+		@params
+			rule: if mysql, username:userpwd@tcp(host:port)/dbname
+				  if sqlite, dbpath
+	*/
 	Dial(rule string) error
 	Create(timeoutS int64) (id *string, e error)
 	Destory(id *string) error
@@ -35,7 +41,7 @@ func New(memoryType *string) (ISession, error) {
 	} else if *memoryType == Memory_type_mysql {
 		return persistent.New("mysql"), nil
 	} else if *memoryType == Memory_type_sqlite {
-		return persistent.New("sqlite"), nil
+		return persistent.New("sqlite3"), nil
 	} else if *memoryType == Memory_type_redis {
 		return redis.New(), nil
 	}

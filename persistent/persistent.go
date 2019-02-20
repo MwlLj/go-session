@@ -1,6 +1,11 @@
 package persistent
 
 type CPersistent struct {
+	m_dbType *string
+}
+
+func (this *CPersistent) init(dbType *string) {
+	this.m_dbType = dbType
 }
 
 func (this *CPersistent) Dial(rule string) error {
@@ -25,5 +30,6 @@ func (this *CPersistent) Reset(id *string, timeoutS *int64) error {
 
 func New(dbType string) *CPersistent {
 	db := CPersistent{}
+	db.init(&dbType)
 	return &db
 }
