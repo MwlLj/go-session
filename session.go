@@ -15,9 +15,15 @@ var Memory_type_redis string = "redis"
 type ISession interface {
 	Dial(rule string) error
 	Create(timeoutS int64) (id *string, e error)
-	Destroy(id *string) error
+	Destory(id *string) error
 	IsValid(id *string) (bool, error)
-	Reset(id *string) error
+	/*
+		@name Reset
+		@params
+			id: Create return id
+			timeoutS: if this field is nil, kepp last timeoutS
+	*/
+	Reset(id *string, timeoutS *int64) error
 }
 
 func New(memoryType *string) (ISession, error) {

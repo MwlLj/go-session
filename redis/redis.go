@@ -11,7 +11,7 @@ func (this *CRedis) Create(timeoutS int64) (id *string, e error) {
 	return nil, nil
 }
 
-func (this *CRedis) Destroy(id *string) error {
+func (this *CRedis) Destory(id *string) error {
 	return nil
 }
 
@@ -19,7 +19,7 @@ func (this *CRedis) IsValid(id *string) (bool, error) {
 	return true, nil
 }
 
-func (this *CRedis) Reset(id *string) error {
+func (this *CRedis) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 

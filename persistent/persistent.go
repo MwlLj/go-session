@@ -11,7 +11,7 @@ func (this *CPersistent) Create(timeoutS int64) (id *string, e error) {
 	return nil, nil
 }
 
-func (this *CPersistent) Destroy(id *string) error {
+func (this *CPersistent) Destory(id *string) error {
 	return nil
 }
 
@@ -19,7 +19,7 @@ func (this *CPersistent) IsValid(id *string) (bool, error) {
 	return true, nil
 }
 
-func (this *CPersistent) Reset(id *string) error {
+func (this *CPersistent) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 
