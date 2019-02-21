@@ -3,8 +3,9 @@ package session
 import (
 	"errors"
 	"github.com/MwlLj/go-session/memory"
-	"github.com/MwlLj/go-session/persistent"
+	"github.com/MwlLj/go-session/mysql"
 	"github.com/MwlLj/go-session/redis"
+	"github.com/MwlLj/go-session/sqlite3"
 )
 
 var Memory_type_sqlite string = "sqlite"
@@ -39,9 +40,9 @@ func New(memoryType *string) (ISession, error) {
 	if *memoryType == Memory_type_memory {
 		return memory.New(), nil
 	} else if *memoryType == Memory_type_mysql {
-		return persistent.New("mysql"), nil
+		return mysql.New(), nil
 	} else if *memoryType == Memory_type_sqlite {
-		return persistent.New("sqlite3"), nil
+		return sqlite3.New(), nil
 	} else if *memoryType == Memory_type_redis {
 		return redis.New(), nil
 	}
