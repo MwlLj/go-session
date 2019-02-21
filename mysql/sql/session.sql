@@ -1,5 +1,7 @@
 #namespace session_db
 
+create database session charset utf8;
+
 #create tables
 /*
 create table if not exists t_session_info (

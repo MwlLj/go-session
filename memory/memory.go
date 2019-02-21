@@ -51,6 +51,7 @@ func (this *CMemory) Dial(rule string) error {
 func (this *CMemory) Create(timeoutS int64) (id *string, e error) {
 	uid, err := uuid.NewV4()
 	if err != nil {
+		log.Println("create uuid error")
 		return nil, err
 	}
 	v4Uuid := uid.String()

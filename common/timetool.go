@@ -5,6 +5,5 @@ import (
 )
 
 func GetNowTimeStampS() int64 {
-	t := time.Now()
-	return int64(t.UTC().Second())
+	return time.Now().Unix()
 }
