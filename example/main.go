@@ -63,7 +63,7 @@ func mysqlTest() {
 func redisTest() {
 	memory, err := session.New(&session.Memory_type_redis)
 	memory.Dial("localhost:6379")
-	id, err := memory.Create(10)
+	id, err := memory.Create(100)
 	if err != nil {
 		log.Println(err)
 		return
@@ -73,9 +73,8 @@ func redisTest() {
 	}
 	time.Sleep(1 * time.Second)
 	// memory.Destory(id)
-	var timeoutS int64 = 10
 	for i := 0; i < 10; i++ {
-		memory.Reset(id, &timeoutS)
+		memory.Reset(id, nil)
 		time.Sleep(1 * time.Second)
 	}
 	isValid, err := memory.IsValid(id)

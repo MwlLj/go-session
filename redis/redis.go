@@ -5,6 +5,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/satori/go.uuid"
 	"log"
+	"strconv"
 )
 
 type CRedis struct {
@@ -28,7 +29,7 @@ func (this *CRedis) Create(timeoutS int64) (id *string, e error) {
 		return nil, err
 	}
 	v4Uuid := uid.String()
-	_, err = this.m_conn.Do("set", v4Uuid, "", "ex", timeoutS)
+	_, err = this.m_conn.Do("set", v4Uuid, strconv.FormatInt(timeoutS, 10), "ex", timeoutS)
 	if err != nil {
 		log.Println("set session error, id: %s, timeoutS: %d\n", v4Uuid, timeoutS)
 		return nil, err
@@ -68,11 +69,23 @@ func (this *CRedis) Reset(id *string, timeoutS *int64) error {
 	if id == nil {
 		return errors.New("reset id is nil")
 	}
+	var timeout int64
 	if timeoutS == nil {
-		log.Println("redis reset must be timeoutS")
-		return errors.New("redis reset timeoutS can't nil")
+		t, err := this.m_conn.Do("get", *id)
+		if err != nil {
+			log.Printf("get id timeout error, err: %v\n", err)
+			return err
+		}
+		timeoutStr := t.([]uint8)
+		timeout, err = strconv.ParseInt(string(timeoutStr), 10, 64)
+		if err != nil {
+			log.Println("parse timeout from string to int error")
+			return err
+		}
+	} else {
+		timeout = *timeoutS
 	}
-	_, err := this.m_conn.Do("expire", *id, *timeoutS)
+	_, err := this.m_conn.Do("expire", *id, timeout)
 	if err != nil {
 		log.Println("update timeout to redis error, err: %v\n", err)
 		return err
