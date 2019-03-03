@@ -65,6 +65,10 @@ func (this *CMemory) Create(timeoutS int64) (id *string, e error) {
 	return &v4Uuid, nil
 }
 
+func (this *CMemory) CreateWithMap(timeoutS int64, extraInfo *map[string]string) (id *string, e error) {
+	return nil, errors.New("not support")
+}
+
 func (this *CMemory) Destory(id *string) error {
 	if id == nil {
 		return errors.New("id is nil")
@@ -92,6 +96,10 @@ func (this *CMemory) IsValid(id *string) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+func (this *CMemory) IsValidWithMap(id *string) (bool, *map[string]string, error) {
+	return false, nil, errors.New("not support")
 }
 
 func (this *CMemory) Reset(id *string, timeoutS *int64) error {

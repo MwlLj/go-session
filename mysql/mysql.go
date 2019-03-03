@@ -69,6 +69,10 @@ func (this *CMysql) Create(timeoutS int64) (id *string, e error) {
 	return &v4Uuid, nil
 }
 
+func (this *CMysql) CreateWithMap(timeoutS int64, extraInfo *map[string]string) (id *string, e error) {
+	return nil, errors.New("not support")
+}
+
 func (this *CMysql) Destory(id *string) error {
 	if id == nil {
 		return errors.New("delete session id is nil")
@@ -101,6 +105,10 @@ func (this *CMysql) IsValid(id *string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func (this *CMysql) IsValidWithMap(id *string) (bool, *map[string]string, error) {
+	return false, nil, errors.New("not support")
 }
 
 func (this *CMysql) Reset(id *string, timeoutS *int64) error {

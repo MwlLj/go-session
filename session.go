@@ -22,8 +22,10 @@ type ISession interface {
 	*/
 	Dial(rule string) error
 	Create(timeoutS int64) (id *string, e error)
+	CreateWithMap(timeoutS int64, extraInfo *map[string]string) (id *string, e error)
 	Destory(id *string) error
 	IsValid(id *string) (bool, error)
+	IsValidWithMap(id *string) (bool, *map[string]string, error)
 	/*
 		@name Reset
 		@params
