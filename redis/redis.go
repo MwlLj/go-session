@@ -33,9 +33,14 @@ func (this *CRedis) Create(timeoutS int64) (id *string, e error) {
 		return nil, err
 	}
 	v4Uuid := uid.String()
-	_, err = this.m_conn.Do("hmset", v4Uuid, fieldTimeStamp, strconv.FormatInt(timeoutS, 10), "ex", timeoutS)
+	_, err = this.m_conn.Do("hmset", v4Uuid, fieldTimeStamp, strconv.FormatInt(timeoutS, 10))
 	if err != nil {
-		log.Println("set session error, id: %s, timeoutS: %d\n", v4Uuid, timeoutS)
+		log.Printf("set session error, id: %s, timeoutS: %d\n", v4Uuid, timeoutS)
+		return nil, err
+	}
+	err = this.Reset(&v4Uuid, &timeoutS)
+	if err != nil {
+		log.Printf("reset time error, err: %v\n", err)
 		return nil, err
 	}
 	return &v4Uuid, nil
@@ -60,11 +65,14 @@ func (this *CRedis) CreateWithMap(timeoutS int64, extraInfo *map[string]string) 
 		}
 	}
 	// add expire time
-	arr = append(arr, "ex")
-	arr = append(arr, timeoutS)
 	_, err = this.m_conn.Do("hmset", arr...)
 	if err != nil {
 		log.Printf("set session error, id: %s, timeoutS: %d\n", v4Uuid, timeoutS)
+		return nil, err
+	}
+	err = this.Reset(&v4Uuid, &timeoutS)
+	if err != nil {
+		log.Printf("reset time error, err: %v\n", err)
 		return nil, err
 	}
 	return &v4Uuid, nil
@@ -86,14 +94,32 @@ func (this *CRedis) IsValid(id *string) (bool, error) {
 	if id == nil {
 		return false, errors.New("isValid id is nil")
 	}
-	result, err := this.m_conn.Do("exists", *id)
+	result, err := redis.Values(this.m_conn.Do("hmget", *id, fieldTimeStamp))
 	if err != nil {
 		log.Println("get is exists from redis error, err: %v\n", err)
 		return false, err
 	}
-	isExist := result.(int64)
-	if isExist == 0 {
+	if result == nil {
 		return false, nil
+	}
+	length := len(result)
+	for i := 0; i < length; i += 2 {
+		v := result[i]
+		vStr := string(v.([]byte))
+		if fieldTimeStamp == vStr {
+			valueStr := string(result[i+1].([]byte))
+			t, err := strconv.ParseInt(valueStr, 10, 64)
+			if err != nil {
+				log.Printf("get timeout error, err: %v\n", err)
+				return false, err
+			}
+			err = this.Reset(id, &t)
+			if err != nil {
+				log.Printf("reset time error, err: %v\n", err)
+				return false, err
+			}
+			continue
+		}
 	}
 	return true, nil
 }
@@ -115,7 +141,18 @@ func (this *CRedis) IsValidWithMap(id *string) (bool, *map[string]string, error)
 	for i := 0; i < length; i += 2 {
 		v := result[i]
 		vStr := string(v.([]byte))
-		if fieldTimeStamp == vStr || "ex" == vStr {
+		if fieldTimeStamp == vStr {
+			valueStr := string(result[i+1].([]byte))
+			t, err := strconv.ParseInt(valueStr, 10, 64)
+			if err != nil {
+				log.Printf("get timeout error, err: %v\n", err)
+				return false, nil, err
+			}
+			err = this.Reset(id, &t)
+			if err != nil {
+				log.Printf("reset time error, err: %v\n", err)
+				return false, nil, err
+			}
 			continue
 		}
 		extraValues[vStr] = string(result[i+1].([]byte))
