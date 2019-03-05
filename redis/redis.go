@@ -94,7 +94,7 @@ func (this *CRedis) IsValid(id *string) (bool, error) {
 	if id == nil {
 		return false, errors.New("isValid id is nil")
 	}
-	result, err := redis.Values(this.m_conn.Do("hmget", *id, fieldTimeStamp))
+	result, err := redis.Values(this.m_conn.Do("hgetall", *id))
 	if err != nil {
 		log.Println("get is exists from redis error, err: %v\n", err)
 		return false, err
