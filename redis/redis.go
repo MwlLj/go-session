@@ -103,6 +103,9 @@ func (this *CRedis) IsValid(id *string) (bool, error) {
 		return false, nil
 	}
 	length := len(result)
+	if length == 0 {
+		return false, nil
+	}
 	for i := 0; i < length; i += 2 {
 		v := result[i]
 		vStr := string(v.([]byte))
