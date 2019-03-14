@@ -137,10 +137,13 @@ func (this *CRedis) IsValidWithMap(id *string) (bool, *map[string]string, error)
 		return false, nil, err
 	}
 	if result == nil {
-		return false, nil, nil
+		return false, nil, errors.New("sessionid not found")
 	}
 	extraValues := make(map[string]string)
 	length := len(result)
+	if length == 0 {
+		return false, nil, errors.New("sessionid not found")
+	}
 	for i := 0; i < length; i += 2 {
 		v := result[i]
 		vStr := string(v.([]byte))
