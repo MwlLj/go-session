@@ -186,6 +186,29 @@ func (this *CRedis) KeyTimeoutNtf() <-chan string {
 	ch := this.m_conn.Subscribe("__key*__:*").Channel()
 	m := <-ch
 	log.Println("invaild", m)
+	_, err := pubsub.Receive()
+	if err != nil {
+		panic(err)
+	}
+
+	// Go channel which receives messages.
+	ch := pubsub.Channel()
+
+	// Publish a message.
+	err = redisdb.Publish("mychannel1", "hello").Err()
+	if err != nil {
+		panic(err)
+	}
+
+	time.AfterFunc(time.Second, func() {
+		// When pubsub is closed channel is closed too.
+		_ = pubsub.Close()
+	})
+
+	// Consume messages.
+	for msg := range ch {
+		fmt.Println(msg.Channel, msg.Payload)
+	}
 	return nil
 }
 

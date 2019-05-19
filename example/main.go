@@ -72,7 +72,7 @@ func redisTest() {
 		log.Println(*id)
 	}
 	time.Sleep(1 * time.Second)
-	memory.KeyTimeoutNtf()
+	go memory.KeyTimeoutNtf()
 	// memory.Destory(id)
 	for i := 0; i < 10; i++ {
 		memory.Reset(id, nil)
