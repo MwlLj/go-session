@@ -38,7 +38,7 @@ func (this *CSqlite3) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 
-func (this *CSqlite3) KeyTimeoutNtf() <-chan string {
+func (this *CSqlite3) KeyTimeoutNtf() <-chan *string {
 	return nil
 }
 

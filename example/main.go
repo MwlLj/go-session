@@ -63,7 +63,7 @@ func mysqlTest() {
 func redisTest() {
 	memory, err := session.New(&session.Memory_type_redis)
 	memory.Dial("localhost:6381")
-	id, err := memory.Create(5000000000)
+	id, err := memory.Create(10)
 	if err != nil {
 		log.Println(err)
 		return
@@ -72,7 +72,12 @@ func redisTest() {
 		log.Println(*id)
 	}
 	time.Sleep(1 * time.Second)
-	go memory.KeyTimeoutNtf()
+	go func() {
+		for {
+			s := memory.KeyTimeoutNtf()
+			log.Println(*s)
+		}
+	}()
 	// memory.Destory(id)
 	for i := 0; i < 10; i++ {
 		memory.Reset(id, nil)
@@ -90,7 +95,7 @@ func redisTest() {
 	extraInfos := make(map[string]string)
 	extraInfos["userType"] = "admin"
 	extraInfos["userUuid"] = "123456"
-	id, err = memory.CreateWithMap(5000000000, &extraInfos)
+	id, err = memory.CreateWithMap(10, &extraInfos)
 	if err != nil {
 		log.Printf("createWithMap error, err: %v\n", err)
 		return

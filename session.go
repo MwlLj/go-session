@@ -33,7 +33,7 @@ type ISession interface {
 			timeoutS: if this field is nil, keep last timeoutS
 	*/
 	Reset(id *string, timeoutS *int64) error
-	KeyTimeoutNtf() <-chan string
+	KeyTimeoutNtf() <-chan *string
 }
 
 func New(memoryType *string) (ISession, error) {

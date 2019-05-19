@@ -127,7 +127,7 @@ func (this *CMemory) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 
-func (this *CMemory) KeyTimeoutNtf() <-chan string {
+func (this *CMemory) KeyTimeoutNtf() <-chan *string {
 	return nil
 }
 

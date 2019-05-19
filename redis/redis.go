@@ -15,7 +15,9 @@ const (
 )
 
 type CRedis struct {
-	m_conn *redis.Client
+	m_conn              *redis.Client
+	m_redisExpiredEvent <-chan *redis.Message
+	m_expiredEvent      chan *string
 }
 
 func (this *CRedis) Dial(rule string) error {
@@ -30,6 +32,20 @@ func (this *CRedis) Dial(rule string) error {
 		log.Fatalf("connect redis server error, rule: %s, err: %v\n", rule, err)
 		return err
 	}
+	// init event notify
+	pb := this.m_conn.PSubscribe("__keyevent@*__expired")
+	_, err = pb.Receive()
+	if err != nil {
+		log.Fatalln("receive subscribe error")
+	}
+	this.m_redisExpiredEvent = pb.Channel()
+	go func() {
+		for {
+			message := <-this.m_redisExpiredEvent
+			s := message.String()
+			this.m_expiredEvent <- &s
+		}
+	}()
 	return nil
 }
 
@@ -174,7 +190,7 @@ func (this *CRedis) Reset(id *string, timeoutS *int64) error {
 	} else {
 		timeout = *timeoutS
 	}
-	err := this.m_conn.Expire(*id, time.Duration(timeout)).Err()
+	err := this.m_conn.Expire(*id, time.Duration(timeout)*time.Second).Err()
 	if err != nil {
 		log.Println("update timeout to redis error, err: %v\n", err)
 		return err
@@ -182,37 +198,36 @@ func (this *CRedis) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 
-func (this *CRedis) KeyTimeoutNtf() <-chan string {
-	ch := this.m_conn.Subscribe("__key*__:*").Channel()
-	m := <-ch
-	log.Println("invaild", m)
-	_, err := pubsub.Receive()
-	if err != nil {
-		panic(err)
-	}
+func (this *CRedis) KeyTimeoutNtf() <-chan *string {
+	return this.m_expiredEvent
+	// _, err := pubsub.Receive()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	// Go channel which receives messages.
-	ch := pubsub.Channel()
+	// // Go channel which receives messages.
+	// ch := pubsub.Channel()
 
-	// Publish a message.
-	err = redisdb.Publish("mychannel1", "hello").Err()
-	if err != nil {
-		panic(err)
-	}
+	// // Publish a message.
+	// err = redisdb.Publish("mychannel1", "hello").Err()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	time.AfterFunc(time.Second, func() {
-		// When pubsub is closed channel is closed too.
-		_ = pubsub.Close()
-	})
+	// time.AfterFunc(time.Second, func() {
+	// 	// When pubsub is closed channel is closed too.
+	// 	_ = pubsub.Close()
+	// })
 
-	// Consume messages.
-	for msg := range ch {
-		fmt.Println(msg.Channel, msg.Payload)
-	}
-	return nil
+	// // Consume messages.
+	// for msg := range ch {
+	// 	fmt.Println(msg.Channel, msg.Payload)
+	// }
+	// return nil
 }
 
 func New() *CRedis {
 	redis := CRedis{}
+	redis.m_expiredEvent = make(chan *string)
 	return &redis
 }
