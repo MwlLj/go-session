@@ -138,6 +138,10 @@ func (this *CMysql) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 
+func (this *CMysql) KeyTimeoutNtf() <-chan string {
+	return nil
+}
+
 func New() *CMysql {
 	db := CMysql{}
 	db.init()

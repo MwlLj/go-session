@@ -127,6 +127,10 @@ func (this *CMemory) Reset(id *string, timeoutS *int64) error {
 	return nil
 }
 
+func (this *CMemory) KeyTimeoutNtf() <-chan string {
+	return nil
+}
+
 func New() *CMemory {
 	memory := CMemory{}
 	memory.init()
