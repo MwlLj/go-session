@@ -63,6 +63,7 @@ func mysqlTest() {
 func redisTest() {
 	memory, err := session.New(&session.Memory_type_redis)
 	memory.Dial("localhost:6381")
+	memory.StartExpiredEventListen()
 	id, err := memory.Create(10)
 	if err != nil {
 		log.Println(err)
@@ -74,7 +75,7 @@ func redisTest() {
 	time.Sleep(1 * time.Second)
 	go func() {
 		for {
-			s := memory.KeyTimeoutNtf()
+			s := <-memory.KeyTimeoutNtf()
 			log.Println(*s)
 		}
 	}()

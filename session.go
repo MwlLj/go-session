@@ -34,6 +34,7 @@ type ISession interface {
 	*/
 	Reset(id *string, timeoutS *int64) error
 	KeyTimeoutNtf() <-chan *string
+	StartExpiredEventListen()
 }
 
 func New(memoryType *string) (ISession, error) {

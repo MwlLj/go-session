@@ -142,6 +142,9 @@ func (this *CMysql) KeyTimeoutNtf() <-chan *string {
 	return nil
 }
 
+func (this *CMysql) StartExpiredEventListen() {
+}
+
 func New() *CMysql {
 	db := CMysql{}
 	db.init()

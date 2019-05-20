@@ -131,6 +131,9 @@ func (this *CMemory) KeyTimeoutNtf() <-chan *string {
 	return nil
 }
 
+func (this *CMemory) StartExpiredEventListen() {
+}
+
 func New() *CMemory {
 	memory := CMemory{}
 	memory.init()

@@ -32,9 +32,13 @@ func (this *CRedis) Dial(rule string) error {
 		log.Fatalf("connect redis server error, rule: %s, err: %v\n", rule, err)
 		return err
 	}
+	return nil
+}
+
+func (this *CRedis) StartExpiredEventListen() {
 	// init event notify
-	pb := this.m_conn.PSubscribe("__keyevent@*__expired")
-	_, err = pb.Receive()
+	pb := this.m_conn.PSubscribe("__keyevent@*__:expired")
+	_, err := pb.Receive()
 	if err != nil {
 		log.Fatalln("receive subscribe error")
 	}
@@ -46,7 +50,6 @@ func (this *CRedis) Dial(rule string) error {
 			this.m_expiredEvent <- &s
 		}
 	}()
-	return nil
 }
 
 func (this *CRedis) Create(timeoutS int64) (id *string, e error) {
@@ -199,31 +202,10 @@ func (this *CRedis) Reset(id *string, timeoutS *int64) error {
 }
 
 func (this *CRedis) KeyTimeoutNtf() <-chan *string {
+	if this.m_expiredEvent == nil {
+		log.Fatalln("please call StartExpiredEventListen")
+	}
 	return this.m_expiredEvent
-	// _, err := pubsub.Receive()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// // Go channel which receives messages.
-	// ch := pubsub.Channel()
-
-	// // Publish a message.
-	// err = redisdb.Publish("mychannel1", "hello").Err()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// time.AfterFunc(time.Second, func() {
-	// 	// When pubsub is closed channel is closed too.
-	// 	_ = pubsub.Close()
-	// })
-
-	// // Consume messages.
-	// for msg := range ch {
-	// 	fmt.Println(msg.Channel, msg.Payload)
-	// }
-	// return nil
 }
 
 func New() *CRedis {

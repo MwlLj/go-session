@@ -42,6 +42,9 @@ func (this *CSqlite3) KeyTimeoutNtf() <-chan *string {
 	return nil
 }
 
+func (this *CSqlite3) StartExpiredEventListen() {
+}
+
 func New() *CSqlite3 {
 	db := CSqlite3{}
 	db.init()
