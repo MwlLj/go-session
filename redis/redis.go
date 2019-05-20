@@ -46,7 +46,7 @@ func (this *CRedis) StartExpiredEventListen() {
 	go func() {
 		for {
 			message := <-this.m_redisExpiredEvent
-			s := message.String()
+			s := message.Payload
 			this.m_expiredEvent <- &s
 		}
 	}()
