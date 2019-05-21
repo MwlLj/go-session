@@ -36,6 +36,9 @@ func (this *CRedis) Dial(rule string) error {
 }
 
 func (this *CRedis) StartExpiredEventListen() {
+	if this.m_conn == nil {
+		log.Fatalln("connect is invaild")
+	}
 	// init event notify
 	pb := this.m_conn.PSubscribe("__keyevent@*__:expired")
 	_, err := pb.Receive()
